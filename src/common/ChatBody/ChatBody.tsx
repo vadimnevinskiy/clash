@@ -1,64 +1,151 @@
-import React from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import cls from "./ChatBody.module.css";
 import MessageText from "../MessageText/MessageText";
 import MessageHeader from "../MessageHeader/MessageHeader";
 import avatar1 from "../../assets/img/avatar1.png";
-import avatar2 from "../../assets/img/avatar2.png";
-import moderator_badge from "../../assets/img/moderator_badge.png";
-import admin_badge from "../../assets/img/admin_badge.png";
+import {useTypedSelector} from "../../hooks/useTypedSelector";
+import {useActions} from "../../hooks/useActions";
+import {io} from "socket.io-client";
+import {Message} from "../../types/historyMessages";
+
+let socket = io(`wss://test-chat-backend-hwads.ondigitalocean.app`, {transports: ["websocket"]});
 
 
-const ChatBody = () => {
+interface PropsType {
+    text: string
+}
+
+const ChatBody: React.FC<PropsType> = ({text}) => {
+    const {historyMessages, limit, skip, error, loading} = useTypedSelector(state => state.historyMessages)
+    const {fetchHistoryMessages, setMessage, setLimitAndSkip} = useActions()
+
+    const chatBodyRef = React.useRef<HTMLDivElement>(null);
+    const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    const [skipCount, setSkipCount] = useState(0)
+    const portion: number = 15;
+
+
+    useEffect(() => {
+        if (text) {
+            // setMessage(text)
+            const nowDate = new Date()
+            const newMessage: Message = {
+                from: 'me',
+                createdAt: nowDate.toISOString(),
+                id: Math.random().toString(16).slice(2),
+                text: text.toString()
+            }
+            // window.alert(JSON.stringify(newMessage));
+            setMessage(newMessage)
+        }
+
+    }, [text])
+
+
+    //Listening server socket
+    useEffect(() => {
+        socket.on('message', (data) => {
+            console.log("Пушим Данные!", data)
+            setMessage(data)
+        });
+    }, [])
+
+
+    //Add event listener when scrolling chat
+    useEffect(() => {
+        fetchHistoryMessages(limit, skip)
+        chatBodyRef.current!.addEventListener('scroll', scrollHandler)
+        return function () {
+            chatBodyRef.current!.removeEventListener('scroll', scrollHandler)
+        }
+    }, [])
+
+
+    //if updated historyMessages, go to bottom of chat
+    useEffect(() => {
+        chatBodyRef.current!.scrollTop = chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight
+    }, [historyMessages])
+
+
+    //Fetching new portion messages
+    let count = 0
+    const fetchingPortion = () => {
+        count = count + 15
+        fetchHistoryMessages(limit, count)
+    }
+
+
+    //If scrolled chat at top, fetching new portion messages
+    const scrollHandler = (e: any) => {
+        if (e.target.scrollTop === 0) {
+            fetchingPortion()
+        }
+    }
+
+
+    if (error) return <div><h1>{error}</h1></div>
+
     return (
-        <>
-            <div className={cls.message}>
-                <div className={cls.messageBlock}>
-                    <MessageText text={"теперь игра закончена)))"}/>
-                </div>
-                <div className={cls.messageTime}>
-                    14:28
-                </div>
-            </div>
-            <div className={cls.message}>
-                <div className={cls.messageBlock}>
-                    <MessageHeader avatar={avatar1} avatarColor={'#DD8A26'} userName={'BivOld'}
-                                   userRating={5}/>
-                    <MessageText
-                        text={"Я думал, что они будут пополняться раз в н-ное время. А тут реально игра закончена"}/>
-                </div>
-                <div className={cls.messageTime}>
-                    14:28
-                </div>
-            </div>
-            <div className={cls.message}>
-                <div className={cls.messageBlock}>
-                    <MessageHeader avatar={avatar2} avatarColor={'#4D69E9'} badge={moderator_badge}
-                                   userName={'Nigativ'} userRating={3}/>
-                    <MessageText text={"wac можно только купить"}/>
-                </div>
-                <div className={cls.messageTime}>
-                    14:31
-                </div>
-            </div>
-            <div className={cls.message}>
-                <div className={cls.messageBlock}>
-                    <MessageHeader avatar={avatar1} avatarColor={'#DD8A26'} badge={admin_badge}
-                                   userName={'Skylifesky'} userRating={10}/>
-                    <MessageText text={"Цена 1 wac = 0,1$ и цена не изменится"}/>
-                </div>
-                <div className={cls.messageTime}>
-                    14:31
-                </div>
-            </div>
-            <div className={cls.message + ' ' + cls.myMessage}>
-                <div className={cls.messageTime}>
-                    10:21
-                </div>
-                <div className={cls.messageBlock}>
-                    <MessageText text={"Сегодня идем на германию"}/>
-                </div>
-            </div>
-        </>
+        <div className={cls.chatBody} ref={chatBodyRef}>
+            {
+                historyMessages.map((message, index) => {
+                    function getDateTime(createdAt: string) {
+                        const d = new Date(createdAt);
+                        const minutes = d.getUTCMinutes().toString()
+                        if (minutes.length < 2) {
+                            return d.getUTCHours() + ':' + '0' + minutes
+                        }
+                        return d.getUTCHours() + ':' + d.getUTCMinutes() + ':' + d.getSeconds()
+                    }
+
+
+                    return (
+                        <>
+                            {
+                                message.from !== 'me' &&
+                                <div className={cls.message} key={message.id + index}>
+                                    <div className={cls.messageBlock}>
+                                        {
+                                            message.from &&
+                                            <MessageHeader avatar={avatar1} avatarColor={'#DD8A26'} userName={message.from}
+                                                           userRating={Math.floor(Math.random() * 5)}/>
+
+                                        }
+                                        index={index + 1}<br/>
+                                        {message.id}<br/><br/>
+                                        <MessageText text={message.text}/>
+                                    </div>
+                                    <div className={cls.messageTime}>
+                                        {
+                                            message.createdAt &&
+                                            getDateTime(message.createdAt)
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            {
+                                message.from === 'me' &&
+                                <div className={cls.message + ' ' + cls.myMessage}>
+                                    <div className={cls.messageTime}>
+                                        {
+                                            message.createdAt &&
+                                            getDateTime(message.createdAt)
+                                        }
+                                    </div>
+                                    <div className={cls.messageBlock}>
+                                        <MessageText text={message.text}/>
+                                    </div>
+                                </div>
+                            }
+                        </>
+                    )
+                })
+            }
+
+
+            <div className={cls.messagesEndRef} ref={messagesEndRef}></div>
+        </div>
     );
 };
 

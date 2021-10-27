@@ -1,5 +1,10 @@
+.chatBody{
+    padding: 0px 0px;
+    height: 400px;
+    overflow-y: auto;
+}
 .message{
-    margin: 0px 0px 10px 0px;
+    margin: 0px 10px 10px 20px;
     display: flex;
     align-items: center;
 }
@@ -10,7 +15,7 @@
     max-width: 80%;
 }
 .myMessage{
-    float: right;
+    justify-content: flex-end;
 }
 .myMessage .messageBlock{
     background: #212121;
@@ -21,4 +26,8 @@
     margin: 0px 10px;
     color: #ffffff;
     opacity: 0.4;
+}
+.messagesEndRef{
+    height: 1px;
+    background: red;
 }

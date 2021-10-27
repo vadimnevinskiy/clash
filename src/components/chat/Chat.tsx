@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import cls from './Chat.module.css'
 import ChatBody from "../../common/ChatBody/ChatBody";
 
@@ -14,7 +14,6 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import {green} from '@mui/material/colors';
-
 import {Form, Field} from "react-final-form";
 
 const useStyles = makeStyles({
@@ -31,8 +30,10 @@ const useStyles = makeStyles({
 
 const Chat = () => {
     const classes = useStyles();
-    const [lang, setLanguage] = React.useState('ru');
-    const [tab, setTab] = React.useState('1');
+    const [lang, setLanguage] = useState<string>('ru');
+    const [tab, setTab] = useState<string>('1');
+    const [text, setText] = useState<string>('');
+
 
     const changeLang = (event: SelectChangeEvent) => {
         setLanguage(event.target.value as string);
@@ -52,7 +53,7 @@ const Chat = () => {
 
 
     const onSubmit = async (values: any) => {
-        window.alert(JSON.stringify(values));
+        setText(JSON.stringify(values.message))
     };
 
     return (
@@ -95,12 +96,12 @@ const Chat = () => {
                     </div>
                 </div>
                 <div className={cls.chatBody}>
-                    <TabPanel value="1">
-                        <ChatBody/>
+                    <TabPanel value="1" sx={{padding: 0}}>
+                        <ChatBody text={text}/>
                     </TabPanel>
-                    <TabPanel value="2"><ChatBody/></TabPanel>
-                    <TabPanel value="3"><ChatBody/></TabPanel>
-                    <TabPanel value="4"><ChatBody/></TabPanel>
+                    <TabPanel value="2"><ChatBody text={text}/></TabPanel>
+                    <TabPanel value="3"><ChatBody text={text}/></TabPanel>
+                    <TabPanel value="4"><ChatBody text={text}/></TabPanel>
                 </div>
                 <div className={cls.chatFooter}>
                     <Form
