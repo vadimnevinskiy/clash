@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import cls from "./ChatBody.module.css";
 import MessageText from "../MessageText/MessageText";
 import MessageHeader from "../MessageHeader/MessageHeader";
@@ -22,24 +22,20 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
     const chatBodyRef = React.useRef<HTMLDivElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
-    const [skipCount, setSkipCount] = useState(0)
-    const portion: number = 15;
 
-
+    // If sent new message from form
     useEffect(() => {
         if (text) {
-            // setMessage(text)
             const nowDate = new Date()
             const newMessage: Message = {
                 from: 'me',
                 createdAt: nowDate.toISOString(),
                 id: Math.random().toString(16).slice(2),
-                text: text.toString()
+                text: text
             }
-            // window.alert(JSON.stringify(newMessage));
             setMessage(newMessage)
+            socket.emit('message', {from: 'meVadim', text: text})
         }
-
     }, [text])
 
 
@@ -56,9 +52,9 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
     useEffect(() => {
         fetchHistoryMessages(limit, skip)
         chatBodyRef.current!.addEventListener('scroll', scrollHandler)
-        return function () {
-            chatBodyRef.current!.removeEventListener('scroll', scrollHandler)
-        }
+        // return function () {
+        //     chatBodyRef.current!.removeEventListener('scroll', scrollHandler)
+        // }
     }, [])
 
 
@@ -101,10 +97,10 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
 
 
                     return (
-                        <>
+                        <div key={message.id + index}>
                             {
                                 message.from !== 'me' &&
-                                <div className={cls.message} key={message.id + index}>
+                                <div className={cls.message}>
                                     <div className={cls.messageBlock}>
                                         {
                                             message.from &&
@@ -138,7 +134,7 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
                                     </div>
                                 </div>
                             }
-                        </>
+                        </div>
                     )
                 })
             }

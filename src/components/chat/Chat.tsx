@@ -15,17 +15,13 @@ import FormControl from '@mui/material/FormControl';
 import Select, {SelectChangeEvent} from '@mui/material/Select';
 import {green} from '@mui/material/colors';
 import {Form, Field} from "react-final-form";
+import MessageForm from "../../common/MessageForm/MessageForm";
+
 
 const useStyles = makeStyles({
     arrowStyle: {
         color: "#cccccc"
     },
-    inactiveStyle: {
-        color: "red"
-    },
-    activeStyle: {
-        color: "yellow"
-    }
 })
 
 const Chat = () => {
@@ -53,8 +49,14 @@ const Chat = () => {
 
 
     const onSubmit = async (values: any) => {
-        setText(JSON.stringify(values.message))
+        setText(values.message)
     };
+    const enterPress = (event: any) => {
+        const body = event.target.value
+        if (event.keyCode === 13 && body) {
+            setText(body)
+        }
+    }
 
     return (
         <div className={cls.chat}>
@@ -69,8 +71,9 @@ const Chat = () => {
                                     variant="scrollable"
                                     scrollButtons="auto"
                                     className={classes.arrowStyle}
+                                    sx={{ color: "#ffffff", padding: 0, margin: 0 }}
                                 >
-                                    <Tab label="Общий" value="1" sx={{color: '#ffffff'}}/>
+                                    <Tab label="Общий" value="1" sx={{ color: "#ffffff" }}/>
                                     <Tab label="Клан" value="2" sx={{color: '#ffffff'}}/>
                                     <Tab label="Друзья" value="3" sx={{color: '#ffffff'}}/>
                                     <Tab label="Новости" value="4" sx={{color: '#ffffff'}}/>
@@ -97,35 +100,28 @@ const Chat = () => {
                 </div>
                 <div className={cls.chatBody}>
                     <TabPanel value="1" sx={{padding: 0}}>
-                        <ChatBody text={text}/>
+                        <div className={cls.chatContainer}>
+                            <ChatBody text={text}/>
+                        </div>
                     </TabPanel>
-                    <TabPanel value="2"><ChatBody text={text}/></TabPanel>
-                    <TabPanel value="3"><ChatBody text={text}/></TabPanel>
-                    <TabPanel value="4"><ChatBody text={text}/></TabPanel>
+                    <TabPanel value="2">
+                        <div className={cls.chatContainer}>
+                            Клан
+                        </div>
+                    </TabPanel>
+                    <TabPanel value="3">
+                        <div className={cls.chatContainer}>
+                            Друзья
+                        </div>
+                    </TabPanel>
+                    <TabPanel value="4">
+                        <div className={cls.chatContainer}>
+                            Новости
+                        </div>
+                    </TabPanel>
                 </div>
                 <div className={cls.chatFooter}>
-                    <Form
-                        onSubmit={onSubmit}
-                        render={({handleSubmit, form, submitting, pristine, values}) => (
-                            <form onSubmit={handleSubmit}>
-                                <div className={cls.chatForm}>
-                                    <div className={cls.textField}>
-                                        <Field
-                                            name="message"
-                                            component="input"
-                                            type="text"
-                                            placeholder="Напишите сообщение"
-                                        />
-                                    </div>
-                                    <div className={cls.formButton}>
-                                        <button type="submit" disabled={submitting || pristine}>
-                                            Submit
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
-                        )}
-                    />
+                    <MessageForm enterPress={onSubmit} onSubmit={onSubmit}/>
                 </div>
 
 
