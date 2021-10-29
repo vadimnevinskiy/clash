@@ -1,5 +1,5 @@
 import React from 'react';
-import cls from "../ChatBody/ChatBody.module.css";
+import cls from "./Time.module.css";
 
 
 interface PropsType {

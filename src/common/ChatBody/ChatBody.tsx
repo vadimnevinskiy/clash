@@ -3,13 +3,15 @@ import cls from "./ChatBody.module.css";
 import MessageText from "../MessageText/MessageText";
 import MessageHeader from "../MessageHeader/MessageHeader";
 import avatar1 from "../../assets/img/avatar1.png";
-import CircularProgress from '@mui/material/CircularProgress';
+
 
 import {useTypedSelector} from "../../hooks/useTypedSelector";
 import {useActions} from "../../hooks/useActions";
 import {io} from "socket.io-client";
 import {Message} from "../../types/historyMessages";
 import Time from "../Time/Time";
+import PreloaderConnection from "../PreloaderConnection/PreloaderConnection";
+import set = Reflect.set;
 
 let socket = io(`wss://test-chat-backend-hwads.ondigitalocean.app`, {transports: ["websocket"]});
 
@@ -21,9 +23,12 @@ interface PropsType {
 const ChatBody: React.FC<PropsType> = ({text}) => {
     const {historyMessages, limit, skip, error} = useTypedSelector(state => state.historyMessages)
     const {fetchHistoryMessages, setMessage} = useActions()
-    const [socketConnected, setSocketConnected] = useState<true | false>(true)
     const chatBodyRef = React.useRef<HTMLDivElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const [viewHistory, setViewHistory] = useState<boolean>(false)
+    const [socketConnected, setSocketConnected] = useState<true | false>(true)
+
+    const [lastPosiiotn, setLastPosition] = useState<number>(0)
 
     //imitation of disconnect
     const imitation = () => {
@@ -44,7 +49,6 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
                 setSocketConnected(socket.connected)
             });
             socket.on('message', (data) => {
-                console.log("Отправляем сообщение!", data)
                 setMessage(data)
             });
         });
@@ -84,7 +88,16 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
 
     //if updated historyMessages, go to bottom of chat
     useEffect(() => {
-        chatBodyRef.current!.scrollTop = chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight
+        if(!viewHistory){
+            chatBodyRef.current!.scrollTop = chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight
+        }
+        if(viewHistory) {
+            console.log('Устанавливаем позицию===============', lastPosiiotn)
+            chatBodyRef.current!.scrollTop = lastPosiiotn
+        }
+        console.log('=====================Загрузка=====================')
+
+
     }, [historyMessages])
 
 
@@ -100,6 +113,22 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
     const scrollHandler = (e: any) => {
         if (e.target.scrollTop === 0) {
             fetchingPortion()
+        }
+        // console.log(e.target.scrollTop, '=====', chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight)
+        // console.log('scrollHeight = ', chatBodyRef.current!.scrollHeight)
+        // console.log('clientHeight = ', chatBodyRef.current!.clientHeight)
+
+
+        if(e.target.scrollTop < (chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight) && e.target.scrollTop > (chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight - 10)) {
+            setLastPosition(e.target.scrollTop)
+            console.log('Запоминаем позицию========', e.target.scrollTop)
+        }
+        if(e.target.scrollTop < chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight) {
+            console.log('Просмотр архива!')
+            setViewHistory(true)
+        } else if (e.target.scrollTop === chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight) {
+            console.log('Последние сообщения!')
+            setViewHistory(false)
         }
     }
 
@@ -131,7 +160,7 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
                                                            userRating={getRandomInt()}/>
 
                                         }
-                                        index={index + 1}<br/>
+                                        {/*index={index + 1}<br/>*/}
                                         {message.id}<br/><br/>
                                         <MessageText text={message.text}/>
                                     </div>
@@ -158,7 +187,7 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
                 })
             }
 
-            {!socketConnected && <div className={cls.progress}>Connection ... <CircularProgress sx={{color: '#ffffff'}} /></div>}
+            {!socketConnected && <PreloaderConnection />}
             <div className={cls.messagesEndRef} ref={messagesEndRef}></div>
         </div>
     );
