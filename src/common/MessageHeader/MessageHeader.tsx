@@ -1,16 +1,16 @@
 import React from 'react';
 import cls from "./MessageHeader.module.css";
-
+import admin_badge from "../../assets/img/admin_badge.png";
+import moderator_badge from "../../assets/img/moderator_badge.png";
 
 interface PropsType {
     avatar: string
     avatarColor: string
-    badge?: string
     userName: string
     userRating: number
 }
 
-const MessageHeader: React.FC<PropsType> = ({avatar, avatarColor, badge, userName, userRating}) => {
+const MessageHeader: React.FC<PropsType> = ({avatar, avatarColor, userName, userRating}) => {
     return (
         <div className={cls.messageHeader}>
             <div className={cls.avatar} style={{background: avatarColor}}>
@@ -20,9 +20,9 @@ const MessageHeader: React.FC<PropsType> = ({avatar, avatarColor, badge, userNam
                 {userName}
             </div>
             {
-                badge &&
+
                 <div className={cls.badge}>
-                    <img src={badge} alt=""/>
+                    <img src={(userRating < 10 && userRating > 8) ? admin_badge : (userRating <= 8 && userRating > 5) ? moderator_badge : ''} alt=""/>
                 </div>
             }
             {

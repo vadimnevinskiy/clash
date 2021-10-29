@@ -3,10 +3,13 @@ import cls from "./ChatBody.module.css";
 import MessageText from "../MessageText/MessageText";
 import MessageHeader from "../MessageHeader/MessageHeader";
 import avatar1 from "../../assets/img/avatar1.png";
+import CircularProgress from '@mui/material/CircularProgress';
+
 import {useTypedSelector} from "../../hooks/useTypedSelector";
 import {useActions} from "../../hooks/useActions";
 import {io} from "socket.io-client";
 import {Message} from "../../types/historyMessages";
+import Time from "../Time/Time";
 
 let socket = io(`wss://test-chat-backend-hwads.ondigitalocean.app`, {transports: ["websocket"]});
 
@@ -16,11 +19,37 @@ interface PropsType {
 }
 
 const ChatBody: React.FC<PropsType> = ({text}) => {
-    const {historyMessages, limit, skip, error, loading} = useTypedSelector(state => state.historyMessages)
-    const {fetchHistoryMessages, setMessage, setLimitAndSkip} = useActions()
-
+    const {historyMessages, limit, skip, error} = useTypedSelector(state => state.historyMessages)
+    const {fetchHistoryMessages, setMessage} = useActions()
+    const [socketConnected, setSocketConnected] = useState<true | false>(true)
     const chatBodyRef = React.useRef<HTMLDivElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+
+    //imitation of disconnect
+    const imitation = () => {
+        setTimeout(() => {
+            socket.disconnect()
+        }, 30000)
+        setTimeout(() => {
+            socket.connect()
+        }, 60000)
+    }
+
+    //Socket check connection
+    useEffect(() => {
+        socket = socket.connect()
+        socket.on('connect', function() {
+            setSocketConnected(socket.connected)
+            socket.on('disconnect', function(){
+                setSocketConnected(socket.connected)
+            });
+            socket.on('message', (data) => {
+                console.log("Отправляем сообщение!", data)
+                setMessage(data)
+            });
+        });
+        // imitation()
+    }, [])
 
 
     // If sent new message from form
@@ -33,19 +62,14 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
                 id: Math.random().toString(16).slice(2),
                 text: text
             }
-            setMessage(newMessage)
-            socket.emit('message', {from: 'meVadim', text: text})
+
+            if(socketConnected) {
+                setMessage(newMessage)
+                socket.emit('message', {from: 'meVadim', text: text})
+            }
         }
     }, [text])
 
-
-    //Listening server socket
-    useEffect(() => {
-        socket.on('message', (data) => {
-            console.log("Пушим Данные!", data)
-            setMessage(data)
-        });
-    }, [])
 
 
     //Add event listener when scrolling chat
@@ -80,22 +104,20 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
     }
 
 
+
+
+
+    const getRandomInt = () => {
+        return (Math.floor(Math.random() * (1 - 10)) + 10);
+    }
+
+
     if (error) return <div><h1>{error}</h1></div>
 
     return (
         <div className={cls.chatBody} ref={chatBodyRef}>
             {
                 historyMessages.map((message, index) => {
-                    function getDateTime(createdAt: string) {
-                        const d = new Date(createdAt);
-                        const minutes = d.getUTCMinutes().toString()
-                        if (minutes.length < 2) {
-                            return d.getUTCHours() + ':' + '0' + minutes
-                        }
-                        return d.getUTCHours() + ':' + d.getUTCMinutes() + ':' + d.getSeconds()
-                    }
-
-
                     return (
                         <div key={message.id + index}>
                             {
@@ -104,31 +126,28 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
                                     <div className={cls.messageBlock}>
                                         {
                                             message.from &&
-                                            <MessageHeader avatar={avatar1} avatarColor={'#DD8A26'} userName={message.from}
-                                                           userRating={Math.floor(Math.random() * 5)}/>
+                                            <MessageHeader avatar={avatar1} avatarColor={'#DD8A26'}
+                                                           userName={message.from}
+                                                           userRating={getRandomInt()}/>
 
                                         }
                                         index={index + 1}<br/>
                                         {message.id}<br/><br/>
                                         <MessageText text={message.text}/>
                                     </div>
-                                    <div className={cls.messageTime}>
-                                        {
-                                            message.createdAt &&
-                                            getDateTime(message.createdAt)
-                                        }
-                                    </div>
+                                    {
+                                        message.createdAt &&
+                                        <Time createdAt={message.createdAt} />
+                                    }
                                 </div>
                             }
                             {
                                 message.from === 'me' &&
                                 <div className={cls.message + ' ' + cls.myMessage}>
-                                    <div className={cls.messageTime}>
-                                        {
-                                            message.createdAt &&
-                                            getDateTime(message.createdAt)
-                                        }
-                                    </div>
+                                    {
+                                        message.createdAt &&
+                                        <Time createdAt={message.createdAt} />
+                                    }
                                     <div className={cls.messageBlock}>
                                         <MessageText text={message.text}/>
                                     </div>
@@ -139,7 +158,7 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
                 })
             }
 
-
+            {!socketConnected && <div className={cls.progress}>Connection ... <CircularProgress sx={{color: '#ffffff'}} /></div>}
             <div className={cls.messagesEndRef} ref={messagesEndRef}></div>
         </div>
     );

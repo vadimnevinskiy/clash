@@ -48,15 +48,10 @@ const Chat = () => {
     });
 
 
-    const onSubmit = async (values: any) => {
+    const onSubmit = (values: any) => {
         setText(values.message)
     };
-    const enterPress = (event: any) => {
-        const body = event.target.value
-        if (event.keyCode === 13 && body) {
-            setText(body)
-        }
-    }
+
 
     return (
         <div className={cls.chat}>

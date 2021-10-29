@@ -31,5 +31,10 @@
 }
 .messagesEndRef{
     height: 1px;
-    background: red;
+}
+
+.progress{
+    position: absolute;
+    right: 20px;
+    bottom: 50px;
 }

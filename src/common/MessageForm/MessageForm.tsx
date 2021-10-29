@@ -1,9 +1,8 @@
-import React from 'react';
+import React, {useState} from 'react';
 import cls from "./MessageForm.module.css";
 import {Field, Form} from "react-final-form";
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
-import { pink } from '@mui/material/colors';
-import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
+
 
 interface PropsType {
     onSubmit: (values: any) => void
@@ -11,10 +10,16 @@ interface PropsType {
 }
 const MessageForm: React.FC<PropsType> = ({enterPress, onSubmit}) => {
 
+    const messageSent = (event: any) => {
+        if (event.keyCode === 13 && event.target.value) {
+            onSubmit(event.target.value)
+        }
+    }
+
     return (
         <Form
             onSubmit={onSubmit}
-            render={({handleSubmit, form, submitting, pristine, values}) => (
+            render={({ handleSubmit, form, submitting, pristine, values }) => (
                 <form onSubmit={handleSubmit}>
                     <div className={cls.chatForm}>
                         <div className={cls.textField}>
@@ -25,7 +30,7 @@ const MessageForm: React.FC<PropsType> = ({enterPress, onSubmit}) => {
                                             {...props.input}
                                             type="text"
                                             placeholder="Напишите сообщение"
-                                            onKeyUp={enterPress}
+                                            onKeyUp={messageSent}
                                             autoComplete={'off'}
                                         />
                                     </div>
@@ -35,9 +40,6 @@ const MessageForm: React.FC<PropsType> = ({enterPress, onSubmit}) => {
                         </div>
                         <div className={cls.formButton}>
                             <SentimentSatisfiedAltIcon  sx={{ color: "#ffffff", opacity: "0.3", cursor: "pointer" }} />
-                            {/*<button type="submit" disabled={submitting || pristine}>*/}
-                            {/*    Submit*/}
-                            {/*</button>*/}
                         </div>
                     </div>
                 </form>
