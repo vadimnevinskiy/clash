@@ -67,6 +67,9 @@ const Chat: React.FC<PropsType> = ({socket}) => {
     const changeMessage = (values: string) => {
         setTempNewMessage(values)
     };
+    const insertEmoji = () => {
+        setTempNewMessage(tempNewMessage + ' :)')
+    }
     const onSubmit = () => {
         setNewMessage(tempNewMessage)
         setTempNewMessage('')
@@ -144,7 +147,7 @@ const Chat: React.FC<PropsType> = ({socket}) => {
                             </TabPanel>
                         </div>
                         <div className={cls.chatFooter}>
-                            <MessageForm onSubmit={onSubmit} changeMessage={changeMessage} tempNewMessage={tempNewMessage} />
+                            <MessageForm onSubmit={onSubmit} changeMessage={changeMessage} insertEmoji={insertEmoji} tempNewMessage={tempNewMessage} />
                         </div>
                     </>
                 }

@@ -6,9 +6,10 @@ import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt
 interface PropsType {
     onSubmit: (values: any) => void
     changeMessage: (values: any) => void
+    insertEmoji: () => void
     tempNewMessage: string
 }
-const MessageForm: React.FC<PropsType> = ({onSubmit, changeMessage, tempNewMessage}) => {
+const MessageForm: React.FC<PropsType> = ({onSubmit, changeMessage, insertEmoji, tempNewMessage}) => {
 
 
     const messageSent = (event: any) => {
@@ -42,7 +43,10 @@ const MessageForm: React.FC<PropsType> = ({onSubmit, changeMessage, tempNewMessa
 
                         </div>
                         <div className={cls.formButton}>
-                            <SentimentSatisfiedAltIcon  sx={{ color: "#ffffff", opacity: "0.3", cursor: "pointer" }} />
+                            <SentimentSatisfiedAltIcon
+                                sx={{ color: "#ffffff", opacity: "0.3", cursor: "pointer" }}
+                                onClick={insertEmoji}
+                            />
                         </div>
                     </div>
                 </form>
