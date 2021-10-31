@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import cls from "./MessageForm.module.css";
 import {Field, Form} from "react-final-form";
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
@@ -10,7 +10,7 @@ interface PropsType {
     tempNewMessage: string
 }
 const MessageForm: React.FC<PropsType> = ({onSubmit, changeMessage, insertEmoji, tempNewMessage}) => {
-
+    const messageFieldRef = useRef<HTMLInputElement>(null);
 
     const messageSent = (event: any) => {
         if (event.keyCode === 13 && event.target.value) {
@@ -18,6 +18,10 @@ const MessageForm: React.FC<PropsType> = ({onSubmit, changeMessage, insertEmoji,
         }
     }
 
+    const clickOnEmoji =() => {
+        insertEmoji()
+        messageFieldRef.current?.focus()
+    }
 
     return (
         <Form
@@ -31,6 +35,7 @@ const MessageForm: React.FC<PropsType> = ({onSubmit, changeMessage, insertEmoji,
                                 {props => (
                                     <div>
                                         <input
+                                            ref={messageFieldRef}
                                             {...props.input}
                                             type="text"
                                             placeholder="Напишите сообщение"
@@ -45,7 +50,7 @@ const MessageForm: React.FC<PropsType> = ({onSubmit, changeMessage, insertEmoji,
                         <div className={cls.formButton}>
                             <SentimentSatisfiedAltIcon
                                 sx={{ color: "#ffffff", opacity: "0.3", cursor: "pointer" }}
-                                onClick={insertEmoji}
+                                onClick={clickOnEmoji}
                             />
                         </div>
                     </div>
