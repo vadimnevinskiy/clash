@@ -17,6 +17,7 @@ import {green} from '@mui/material/colors';
 import MessageForm from "../../common/MessageForm/MessageForm";
 import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
+import {io} from "socket.io-client";
 
 const useStyles = makeStyles({
     arrowStyle: {
@@ -25,6 +26,9 @@ const useStyles = makeStyles({
 })
 
 const Chat = () => {
+
+    let socket = io(`wss://test-chat-backend-hwads.ondigitalocean.app`, {transports: ["websocket"]});
+
     const classes = useStyles();
     const [lang, setLanguage] = useState<string>('ru');
     const [tab, setTab] = useState<string>('1');
@@ -108,7 +112,7 @@ const Chat = () => {
                         <div className={cls.chatBody}>
                             <TabPanel value="1" sx={{padding: 0}}>
                                 <div className={cls.chatContainer}>
-                                    <ChatBody text={text}/>
+                                    <ChatBody text={text} socket={socket}/>
                                 </div>
                             </TabPanel>
                             <TabPanel value="2">

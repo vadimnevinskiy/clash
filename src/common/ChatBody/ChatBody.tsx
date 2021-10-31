@@ -7,28 +7,26 @@ import avatar1 from "../../assets/img/avatar1.png";
 
 import {useTypedSelector} from "../../hooks/useTypedSelector";
 import {useActions} from "../../hooks/useActions";
-import {io} from "socket.io-client";
+import {Socket} from "socket.io-client";
 import {Message} from "../../types/historyMessages";
 import Time from "../Time/Time";
 import PreloaderConnection from "../PreloaderConnection/PreloaderConnection";
-import set = Reflect.set;
-
-let socket = io(`wss://test-chat-backend-hwads.ondigitalocean.app`, {transports: ["websocket"]});
+import MessageItem from "../MessageItem/MessageItem";
 
 
 interface PropsType {
     text: string
+    socket: Socket
 }
 
-const ChatBody: React.FC<PropsType> = ({text}) => {
+const ChatBody: React.FC<PropsType> = ({text, socket}) => {
     const {historyMessages, limit, skip, error} = useTypedSelector(state => state.historyMessages)
-    const {fetchHistoryMessages, setMessage} = useActions()
     const chatBodyRef = React.useRef<HTMLDivElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
+    const {fetchHistoryMessages, setMessage} = useActions()
     const [viewHistory, setViewHistory] = useState<boolean>(false)
     const [socketConnected, setSocketConnected] = useState<true | false>(true)
-
-    const [lastPosiiotn, setLastPosition] = useState<number>(0)
+    const [lastPosition, setLastPosition] = useState<number>(0)
 
     //imitation of disconnect
     const imitation = () => {
@@ -40,20 +38,20 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
         }, 60000)
     }
 
-    //Socket check connection
-    useEffect(() => {
-        socket = socket.connect()
-        socket.on('connect', function() {
-            setSocketConnected(socket.connected)
-            socket.on('disconnect', function(){
-                setSocketConnected(socket.connected)
-            });
-            socket.on('message', (data) => {
-                setMessage(data)
-            });
-        });
-        // imitation()
-    }, [])
+    // //Socket check connection
+    // useEffect(() => {
+    //     socket = socket.connect()
+    //     socket.on('connect', function() {
+    //         setSocketConnected(socket.connected)
+    //         socket.on('disconnect', function(){
+    //             setSocketConnected(socket.connected)
+    //         });
+    //         socket.on('message', (data) => {
+    //             setMessage(data)
+    //         });
+    //     });
+    //     // imitation()
+    // }, [])
 
 
     // If sent new message from form
@@ -66,14 +64,12 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
                 id: Math.random().toString(16).slice(2),
                 text: text
             }
-
-            if(socketConnected) {
+            if (socketConnected) {
                 setMessage(newMessage)
                 socket.emit('message', {from: 'meVadim', text: text})
             }
         }
     }, [text])
-
 
 
     //Add event listener when scrolling chat
@@ -88,16 +84,14 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
 
     //if updated historyMessages, go to bottom of chat
     useEffect(() => {
-        if(!viewHistory){
+        if (!viewHistory) {
             chatBodyRef.current!.scrollTop = chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight
         }
-        if(viewHistory) {
-            console.log('Устанавливаем позицию===============', lastPosiiotn)
-            chatBodyRef.current!.scrollTop = lastPosiiotn
+        if (viewHistory) {
+            console.log('Устанавливаем позицию===============', lastPosition)
+            chatBodyRef.current!.scrollTop = lastPosition
         }
         console.log('=====================Загрузка=====================')
-
-
     }, [historyMessages])
 
 
@@ -119,11 +113,13 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
         // console.log('clientHeight = ', chatBodyRef.current!.clientHeight)
 
 
-        if(e.target.scrollTop < (chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight) && e.target.scrollTop > (chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight - 10)) {
+        if (e.target.scrollTop < (chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight) && e.target.scrollTop > (chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight - 10)) {
             setLastPosition(e.target.scrollTop)
             console.log('Запоминаем позицию========', e.target.scrollTop)
         }
-        if(e.target.scrollTop < chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight) {
+
+
+        if (e.target.scrollTop < chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight) {
             console.log('Просмотр архива!')
             setViewHistory(true)
         } else if (e.target.scrollTop === chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight) {
@@ -135,12 +131,6 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
 
 
 
-
-    const getRandomInt = () => {
-        return (Math.floor(Math.random() * (1 - 10)) + 10);
-    }
-
-
     if (error) return <div><h1>{error}</h1></div>
 
     return (
@@ -149,45 +139,13 @@ const ChatBody: React.FC<PropsType> = ({text}) => {
                 historyMessages.map((message, index) => {
                     return (
                         <div key={message.id + index}>
-                            {
-                                message.from !== 'me' &&
-                                <div className={cls.message}>
-                                    <div className={cls.messageBlock}>
-                                        {
-                                            message.from &&
-                                            <MessageHeader avatar={avatar1} avatarColor={'#DD8A26'}
-                                                           userName={message.from}
-                                                           userRating={getRandomInt()}/>
-
-                                        }
-                                        {/*index={index + 1}<br/>*/}
-                                        {message.id}<br/><br/>
-                                        <MessageText text={message.text}/>
-                                    </div>
-                                    {
-                                        message.createdAt &&
-                                        <Time createdAt={message.createdAt} />
-                                    }
-                                </div>
-                            }
-                            {
-                                message.from === 'me' &&
-                                <div className={cls.message + ' ' + cls.myMessage}>
-                                    {
-                                        message.createdAt &&
-                                        <Time createdAt={message.createdAt} />
-                                    }
-                                    <div className={cls.messageBlock}>
-                                        <MessageText text={message.text}/>
-                                    </div>
-                                </div>
-                            }
+                            <MessageItem message={message} />
                         </div>
                     )
                 })
             }
 
-            {!socketConnected && <PreloaderConnection />}
+            {!socketConnected && <PreloaderConnection/>}
             <div className={cls.messagesEndRef} ref={messagesEndRef}></div>
         </div>
     );
