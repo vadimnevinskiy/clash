@@ -38,6 +38,7 @@ const Chat: React.FC<PropsType> = ({socket}) => {
     const [lang, setLanguage] = useState<string>('ru');
     const [tab, setTab] = useState<string>('1');
     const [newMessage, setNewMessage] = useState<string>('');
+    const [tempNewMessage, setTempNewMessage] = useState<string>('');
     const [hideChat, setHideChat] = useState<boolean>(false)
 
 
@@ -63,8 +64,12 @@ const Chat: React.FC<PropsType> = ({socket}) => {
     });
 
 
-    const onSubmit = (values: any) => {
-        setNewMessage(values.message)
+    const changeMessage = (values: string) => {
+        setTempNewMessage(values)
+    };
+    const onSubmit = () => {
+        setNewMessage(tempNewMessage)
+        setTempNewMessage('')
     };
 
 
@@ -139,7 +144,7 @@ const Chat: React.FC<PropsType> = ({socket}) => {
                             </TabPanel>
                         </div>
                         <div className={cls.chatFooter}>
-                            <MessageForm onSubmit={onSubmit} newMessage={newMessage} />
+                            <MessageForm onSubmit={onSubmit} changeMessage={changeMessage} tempNewMessage={tempNewMessage} />
                         </div>
                     </>
                 }

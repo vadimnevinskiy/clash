@@ -5,9 +5,10 @@ import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt
 
 interface PropsType {
     onSubmit: (values: any) => void
-    newMessage: string
+    changeMessage: (values: any) => void
+    tempNewMessage: string
 }
-const MessageForm: React.FC<PropsType> = ({onSubmit, newMessage}) => {
+const MessageForm: React.FC<PropsType> = ({onSubmit, changeMessage, tempNewMessage}) => {
 
 
     const messageSent = (event: any) => {
@@ -20,7 +21,7 @@ const MessageForm: React.FC<PropsType> = ({onSubmit, newMessage}) => {
     return (
         <Form
             onSubmit={onSubmit}
-            initialValues={{ message: newMessage }}
+            initialValues={{ message: tempNewMessage }}
             render={({ handleSubmit, form, submitting, pristine, values }) => (
                 <form onSubmit={handleSubmit}>
                     <div className={cls.chatForm}>
@@ -33,6 +34,7 @@ const MessageForm: React.FC<PropsType> = ({onSubmit, newMessage}) => {
                                             type="text"
                                             placeholder="Напишите сообщение"
                                             autoComplete={'off'}
+                                            onChange={(e) => changeMessage(e.target.value)}
                                         />
                                     </div>
                                 )}
