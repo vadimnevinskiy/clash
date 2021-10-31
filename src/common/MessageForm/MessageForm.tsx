@@ -3,12 +3,12 @@ import cls from "./MessageForm.module.css";
 import {Field, Form} from "react-final-form";
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
 
-
 interface PropsType {
     onSubmit: (values: any) => void
-    enterPress: (event: any) => void
+    newMessage: string
 }
-const MessageForm: React.FC<PropsType> = ({enterPress, onSubmit}) => {
+const MessageForm: React.FC<PropsType> = ({onSubmit, newMessage}) => {
+
 
     const messageSent = (event: any) => {
         if (event.keyCode === 13 && event.target.value) {
@@ -16,9 +16,11 @@ const MessageForm: React.FC<PropsType> = ({enterPress, onSubmit}) => {
         }
     }
 
+
     return (
         <Form
             onSubmit={onSubmit}
+            initialValues={{ message: newMessage }}
             render={({ handleSubmit, form, submitting, pristine, values }) => (
                 <form onSubmit={handleSubmit}>
                     <div className={cls.chatForm}>
@@ -30,7 +32,6 @@ const MessageForm: React.FC<PropsType> = ({enterPress, onSubmit}) => {
                                             {...props.input}
                                             type="text"
                                             placeholder="Напишите сообщение"
-                                            onKeyUp={messageSent}
                                             autoComplete={'off'}
                                         />
                                     </div>

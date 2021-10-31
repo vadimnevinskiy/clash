@@ -15,11 +15,11 @@ import MessageItem from "../MessageItem/MessageItem";
 
 
 interface PropsType {
-    text: string
+    newMessage: string
     socket: Socket
 }
 
-const ChatBody: React.FC<PropsType> = ({text, socket}) => {
+const ChatBody: React.FC<PropsType> = ({newMessage, socket}) => {
     const {historyMessages, limit, skip, error} = useTypedSelector(state => state.historyMessages)
     const chatBodyRef = React.useRef<HTMLDivElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -38,38 +38,38 @@ const ChatBody: React.FC<PropsType> = ({text, socket}) => {
         }, 60000)
     }
 
-    // //Socket check connection
-    // useEffect(() => {
-    //     socket = socket.connect()
-    //     socket.on('connect', function() {
-    //         setSocketConnected(socket.connected)
-    //         socket.on('disconnect', function(){
-    //             setSocketConnected(socket.connected)
-    //         });
-    //         socket.on('message', (data) => {
-    //             setMessage(data)
-    //         });
-    //     });
-    //     // imitation()
-    // }, [])
+    //Socket check connection
+    useEffect(() => {
+        socket = socket.connect()
+        socket.on('connect', function() {
+            setSocketConnected(socket.connected)
+            socket.on('disconnect', function(){
+                setSocketConnected(socket.connected)
+            });
+            socket.on('message', (data) => {
+                setMessage(data)
+            });
+        });
+        // imitation()
+    }, [])
 
 
     // If sent new message from form
     useEffect(() => {
-        if (text) {
+        if (newMessage) {
             const nowDate = new Date()
-            const newMessage: Message = {
+            const message: Message = {
                 from: 'me',
                 createdAt: nowDate.toISOString(),
                 id: Math.random().toString(16).slice(2),
-                text: text
+                text: newMessage
             }
             if (socketConnected) {
-                setMessage(newMessage)
-                socket.emit('message', {from: 'meVadim', text: text})
+                setMessage(message)
+                socket.emit('message', {from: 'meVadim', text: newMessage})
             }
         }
-    }, [text])
+    }, [newMessage])
 
 
     //Add event listener when scrolling chat

@@ -17,7 +17,7 @@ import {green} from '@mui/material/colors';
 import MessageForm from "../../common/MessageForm/MessageForm";
 import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
 import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
-import {io} from "socket.io-client";
+import {io, Socket} from "socket.io-client";
 
 const useStyles = makeStyles({
     arrowStyle: {
@@ -25,15 +25,22 @@ const useStyles = makeStyles({
     },
 })
 
-const Chat = () => {
 
-    let socket = io(`wss://test-chat-backend-hwads.ondigitalocean.app`, {transports: ["websocket"]});
+interface PropsType {
+    socket: Socket
+}
+
+const Chat: React.FC<PropsType> = ({socket}) => {
+
+
 
     const classes = useStyles();
     const [lang, setLanguage] = useState<string>('ru');
     const [tab, setTab] = useState<string>('1');
-    const [text, setText] = useState<string>('');
+    const [newMessage, setNewMessage] = useState<string>('');
     const [hideChat, setHideChat] = useState<boolean>(false)
+
+
 
 
     const changeLang = (event: SelectChangeEvent) => {
@@ -57,7 +64,7 @@ const Chat = () => {
 
 
     const onSubmit = (values: any) => {
-        setText(values.message)
+        setNewMessage(values.message)
     };
 
 
@@ -112,7 +119,7 @@ const Chat = () => {
                         <div className={cls.chatBody}>
                             <TabPanel value="1" sx={{padding: 0}}>
                                 <div className={cls.chatContainer}>
-                                    <ChatBody text={text} socket={socket}/>
+                                    <ChatBody newMessage={newMessage} socket={socket}/>
                                 </div>
                             </TabPanel>
                             <TabPanel value="2">
@@ -132,7 +139,7 @@ const Chat = () => {
                             </TabPanel>
                         </div>
                         <div className={cls.chatFooter}>
-                            <MessageForm enterPress={onSubmit} onSubmit={onSubmit}/>
+                            <MessageForm onSubmit={onSubmit} newMessage={newMessage} />
                         </div>
                     </>
                 }
