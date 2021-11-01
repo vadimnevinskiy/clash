@@ -1,29 +1,26 @@
 import React, {useState} from 'react';
+import {Socket} from "socket.io-client";
+
 import cls from './Chat.module.css'
 import ChatBody from "../../common/ChatBody/ChatBody";
+import MessageForm from "../../common/MessageForm/MessageForm";
+import ControlPanel from "../../common/ControlPanel/ControlPanel";
+import MenuLanguage from "../../common/MenuLanguage/MenuLanguage";
 
 import {createTheme, ThemeProvider} from '@mui/material/styles';
-import {makeStyles} from '@mui/styles';
-
 import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import {TabContext, TabPanel} from '@mui/lab';
 
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select, {SelectChangeEvent} from '@mui/material/Select';
-import {green} from '@mui/material/colors';
-import MessageForm from "../../common/MessageForm/MessageForm";
-import CloseFullscreenIcon from '@mui/icons-material/CloseFullscreen';
-import HorizontalRuleIcon from '@mui/icons-material/HorizontalRule';
-import {io, Socket} from "socket.io-client";
+import 'antd/dist/antd.css';
 
-const useStyles = makeStyles({
-    arrowStyle: {
-        color: "#cccccc"
-    },
-})
+import {green} from '@mui/material/colors';
+
+
+
+
+
 
 
 interface PropsType {
@@ -31,11 +28,6 @@ interface PropsType {
 }
 
 const Chat: React.FC<PropsType> = ({socket}) => {
-
-
-
-    const classes = useStyles();
-    const [lang, setLanguage] = useState<string>('ru');
     const [tab, setTab] = useState<string>('1');
     const [newMessage, setNewMessage] = useState<string>('');
     const [tempNewMessage, setTempNewMessage] = useState<string>('');
@@ -44,9 +36,7 @@ const Chat: React.FC<PropsType> = ({socket}) => {
 
 
 
-    const changeLang = (event: SelectChangeEvent) => {
-        setLanguage(event.target.value as string);
-    };
+
     const changeTab = (event: React.SyntheticEvent, newValue: string) => {
         setTab(newValue);
     };
@@ -63,7 +53,7 @@ const Chat: React.FC<PropsType> = ({socket}) => {
         },
     });
 
-
+    //Writing new message
     const changeMessage = (values: string) => {
         setTempNewMessage(values)
     };
@@ -76,8 +66,9 @@ const Chat: React.FC<PropsType> = ({socket}) => {
     };
 
 
-    return (
 
+
+    return (
         <div className={cls.chat}>
             <TabContext value={tab}>
                 <div className={cls.chatHeader}>
@@ -89,7 +80,6 @@ const Chat: React.FC<PropsType> = ({socket}) => {
                                     onChange={changeTab}
                                     variant="scrollable"
                                     scrollButtons="auto"
-                                    className={classes.arrowStyle}
                                     sx={{color: "#ffffff", padding: 0, margin: 0}}
                                 >
                                     <Tab label="Общий" value="1" sx={{color: "#ffffff"}}/>
@@ -100,26 +90,8 @@ const Chat: React.FC<PropsType> = ({socket}) => {
                             </ThemeProvider>
                         </Box>
                     </div>
-                    <div className={cls.menuLang}>
-                        <FormControl fullWidth sx={{border: 'none'}} className={classes.arrowStyle}>
-                            <Select
-                                value={lang}
-                                onChange={changeLang}
-                                sx={{color: '#ffffff', borderRadius: 0, borderColor: '#ffffff'}}
-                            >
-                                <MenuItem value={'ru'}>Ru</MenuItem>
-                                <MenuItem value={'en'}>En</MenuItem>
-                            </Select>
-                        </FormControl>
-                    </div>
-                    <div className={cls.controlPanel}>
-                        <span className={cls.expandMenu}>
-                            <CloseFullscreenIcon sx={{color: '#ACACAC', fontSize: 13}}/>
-                        </span>
-                        <span className={cls.minimizeMenu} onClick={hideChatToggle}>
-                            <HorizontalRuleIcon sx={{color: '#ACACAC', fontSize: 13}}/>
-                        </span>
-                    </div>
+                    <MenuLanguage />
+                    <ControlPanel hideChatToggle={hideChatToggle} />
                 </div>
                 {
                     !hideChat &&

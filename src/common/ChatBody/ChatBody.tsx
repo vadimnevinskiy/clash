@@ -1,17 +1,17 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {Socket} from "socket.io-client";
+
 import cls from "./ChatBody.module.css";
-import MessageText from "../MessageText/MessageText";
-import MessageHeader from "../MessageHeader/MessageHeader";
-import avatar1 from "../../assets/img/avatar1.png";
+import {Message} from "../../types/historyMessages";
+import PreloaderConnection from "../PreloaderConnection/PreloaderConnection";
+import MessageItem from "../MessageItem/MessageItem";
 
 
 import {useTypedSelector} from "../../hooks/useTypedSelector";
 import {useActions} from "../../hooks/useActions";
-import {Socket} from "socket.io-client";
-import {Message} from "../../types/historyMessages";
-import Time from "../Time/Time";
-import PreloaderConnection from "../PreloaderConnection/PreloaderConnection";
-import MessageItem from "../MessageItem/MessageItem";
+
+
+
 
 
 interface PropsType {
@@ -112,8 +112,11 @@ const ChatBody: React.FC<PropsType> = ({newMessage, socket}) => {
         // console.log('scrollHeight = ', chatBodyRef.current!.scrollHeight)
         // console.log('clientHeight = ', chatBodyRef.current!.clientHeight)
 
+        const scrollTop = e.target.scrollTop
+        const scrollHeight = chatBodyRef.current!.scrollHeight
+        const clientHeight = chatBodyRef.current!.clientHeight
 
-        if (e.target.scrollTop < (chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight) && e.target.scrollTop > (chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight - 10)) {
+        if (scrollTop < (scrollHeight - clientHeight) && scrollTop > (scrollHeight - clientHeight - 10)) {
             setLastPosition(e.target.scrollTop)
             console.log('Запоминаем позицию========', e.target.scrollTop)
         }

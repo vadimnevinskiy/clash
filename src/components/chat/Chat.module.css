@@ -36,13 +36,8 @@
     padding: 17px 10px 10px 10px;
 }
 
-.menuLang ul{
-    margin: 0px;
-    padding: 0px;
-    color: #ffffff;
-    list-style: none;
-    font-size: 13px;
-}
+
+
 .chatContainer{
     min-height: 400px;
 }
@@ -51,17 +46,5 @@
     border-radius: 0px  0px 20px 20px;
     padding: 5px 10px 5px 15px;
 }
-.controlPanel{
-    display: flex;
-    align-items: center;
-}
-.expandMenu, .minimizeMenu{
-    background: rgba(255, 255, 255, 0.2);
-    display: inline-block;
-    padding: 5px;
-    margin: 0px 3px;
-    width: 13px;
-    height: 13px;
-    border-radius: 50%;
-    cursor: pointer;
-}
+
+

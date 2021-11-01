@@ -1,7 +1,9 @@
-import React, {useRef, useState} from 'react';
+import React, {useRef} from 'react';
 import cls from "./MessageForm.module.css";
 import {Field, Form} from "react-final-form";
 import SentimentSatisfiedAltIcon from '@mui/icons-material/SentimentSatisfiedAlt';
+
+
 
 interface PropsType {
     onSubmit: (values: any) => void
