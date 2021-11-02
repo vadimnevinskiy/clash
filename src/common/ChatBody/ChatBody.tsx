@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {Socket} from "socket.io-client";
-
 import cls from "./ChatBody.module.css";
+
 import {Message} from "../../types/historyMessages";
 import PreloaderConnection from "../PreloaderConnection/PreloaderConnection";
 import MessageItem from "../MessageItem/MessageItem";
@@ -78,9 +78,6 @@ const ChatBody: React.FC<PropsType> = ({newMessage, socket}) => {
     useEffect(() => {
         fetchHistoryMessages(limit, skip)
         chatBodyRef.current!.addEventListener('scroll', scrollHandler)
-        // return function () {
-        //     chatBodyRef.current!.removeEventListener('scroll', scrollHandler)
-        // }
     }, [])
 
 

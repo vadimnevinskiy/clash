@@ -1,10 +1,12 @@
 import React, {useMemo} from 'react';
 import cls from "./MessageItem.module.css";
+
+import {Message} from "../../types/historyMessages";
 import MessageHeader from "../MessageHeader/MessageHeader";
-import avatar1 from "../../assets/img/avatar1.png";
 import MessageText from "../MessageText/MessageText";
 import Time from "../Time/Time";
-import {Message} from "../../types/historyMessages";
+import avatar1 from "../../assets/img/avatar1.png";
+
 
 
 interface PropsType {

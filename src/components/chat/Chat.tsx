@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Socket} from "socket.io-client";
-
 import cls from './Chat.module.css'
+
 import ChatBody from "../../common/ChatBody/ChatBody";
 import MessageForm from "../../common/MessageForm/MessageForm";
 import ControlPanel from "../../common/ControlPanel/ControlPanel";
@@ -12,10 +12,11 @@ import Box from '@mui/material/Box';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
 import {TabContext, TabPanel} from '@mui/lab';
+import {green} from '@mui/material/colors';
 
 import 'antd/dist/antd.css';
 
-import {green} from '@mui/material/colors';
+
 
 
 
