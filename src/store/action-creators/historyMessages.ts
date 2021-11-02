@@ -24,13 +24,3 @@ export const setMessage = (message: Message) => {
         }
     }
 }
-
-export const setLimitAndSkip = (limit: number, skip: number) => {
-    return (dispatch: Dispatch<HistoryMessagesTypes>) => {
-        try {
-            dispatch({type: HistoryMessagesEnums.SET_LIMIT_SKIP, payload: {limit, skip}})
-        } catch (error) {
-            dispatch({type: HistoryMessagesEnums.FETCH_HISTORY_ERROR, payload: 'Loading error!'})
-        }
-    }
-}

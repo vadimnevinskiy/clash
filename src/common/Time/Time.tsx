@@ -13,7 +13,8 @@ const Time: React.FC<PropsType> = ({createdAt}) => {
         if (minutes.length < 2) {
             return d.getUTCHours() + ':' + '0' + minutes
         }
-        return d.getUTCHours() + ':' + d.getUTCMinutes() + ':' + d.getSeconds()
+        // return d.getUTCHours() + ':' + d.getUTCMinutes() + ':' + d.getSeconds()
+        return d.getUTCHours() + ':' + d.getUTCMinutes()
     }
 
 
