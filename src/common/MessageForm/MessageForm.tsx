@@ -14,7 +14,7 @@ interface PropsType {
 const MessageForm: React.FC<PropsType> = ({onSubmit, changeMessage, insertEmoji, tempNewMessageText}) => {
     const messageFieldRef = useRef<HTMLInputElement>(null);
 
-    const clickOnEmoji =() => {
+    const clickOnEmoji = () => {
         insertEmoji()
         messageFieldRef.current?.focus()
     }

@@ -1,4 +1,4 @@
-import React, {useCallback, useState} from 'react';
+import React, {useState} from 'react';
 import {Socket} from "socket.io-client";
 
 import cls from './Chat.module.css'

@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useMemo} from 'react';
 import cls from "./MessageItem.module.css";
 import MessageHeader from "../MessageHeader/MessageHeader";
 import avatar1 from "../../assets/img/avatar1.png";
@@ -14,9 +14,9 @@ interface PropsType {
 }
 const MessageItem: React.FC<PropsType> = ({message, index}) => {
 
-    const getLevelValue  = () => {
+    const getLevelValue  = useMemo(() => {
         return (Math.floor(Math.random() * (1 - 10)) + 10);
-    }
+    }, [])
 
     return (
             <>
@@ -29,7 +29,7 @@ const MessageItem: React.FC<PropsType> = ({message, index}) => {
                             message.from &&
                             <MessageHeader avatar={avatar1} avatarColor={'#DD8A26'}
                                            userName={message.from}
-                                           userRating={getLevelValue()}/>
+                                           userRating={getLevelValue}/>
 
                         }
                         {/*index={index + 1}<br/>*/}
