@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import {Socket} from "socket.io-client";
 
 import cls from './Chat.module.css'
@@ -30,7 +30,7 @@ interface PropsType {
 const Chat: React.FC<PropsType> = ({socket}) => {
     const [tab, setTab] = useState<string>('1');
     const [newMessage, setNewMessage] = useState<string>('');
-    const [tempNewMessage, setTempNewMessage] = useState<string>('');
+    const [tempNewMessageText, setTempNewMessageText] = useState<string>('');
     const [hideChat, setHideChat] = useState<boolean>(false)
 
 
@@ -54,15 +54,16 @@ const Chat: React.FC<PropsType> = ({socket}) => {
     });
 
     //Writing new message
-    const changeMessage = (values: string) => {
-        setTempNewMessage(values)
+    const changeMessage = (value: string) => {
+        setTempNewMessageText(value)
     };
+
     const insertEmoji = () => {
-        setTempNewMessage(tempNewMessage + ' :)')
+        setTempNewMessageText(tempNewMessageText + ' :)')
     }
     const onSubmit = () => {
-        setNewMessage(tempNewMessage)
-        setTempNewMessage('')
+        setNewMessage(tempNewMessageText)
+        setTempNewMessageText('')
     };
 
 
@@ -119,7 +120,7 @@ const Chat: React.FC<PropsType> = ({socket}) => {
                             </TabPanel>
                         </div>
                         <div className={cls.chatFooter}>
-                            <MessageForm onSubmit={onSubmit} changeMessage={changeMessage} insertEmoji={insertEmoji} tempNewMessage={tempNewMessage} />
+                            <MessageForm onSubmit={onSubmit} changeMessage={changeMessage} insertEmoji={insertEmoji} tempNewMessageText={tempNewMessageText} />
                         </div>
                     </>
                 }

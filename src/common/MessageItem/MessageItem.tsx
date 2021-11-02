@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import cls from "./MessageItem.module.css";
 import MessageHeader from "../MessageHeader/MessageHeader";
 import avatar1 from "../../assets/img/avatar1.png";
@@ -9,11 +9,12 @@ import {Message} from "../../types/historyMessages";
 
 interface PropsType {
     message: Message
+    index: number
 
 }
-const MessageItem: React.FC<PropsType> = ({message}) => {
+const MessageItem: React.FC<PropsType> = ({message, index}) => {
 
-    const getRandomInt = () => {
+    const getLevelValue  = () => {
         return (Math.floor(Math.random() * (1 - 10)) + 10);
     }
 
@@ -21,14 +22,14 @@ const MessageItem: React.FC<PropsType> = ({message}) => {
             <>
             {
                 message.from !== 'me' &&
-
                 <div className={cls.message}>
                     <div className={cls.messageBlock}>
+                        {/*<span>{index}={message.id}</span>*/}
                         {
                             message.from &&
                             <MessageHeader avatar={avatar1} avatarColor={'#DD8A26'}
                                            userName={message.from}
-                                           userRating={getRandomInt()}/>
+                                           userRating={getLevelValue()}/>
 
                         }
                         {/*index={index + 1}<br/>*/}

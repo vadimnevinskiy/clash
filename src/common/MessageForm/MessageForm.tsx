@@ -9,16 +9,10 @@ interface PropsType {
     onSubmit: (values: any) => void
     changeMessage: (values: any) => void
     insertEmoji: () => void
-    tempNewMessage: string
+    tempNewMessageText: string
 }
-const MessageForm: React.FC<PropsType> = ({onSubmit, changeMessage, insertEmoji, tempNewMessage}) => {
+const MessageForm: React.FC<PropsType> = ({onSubmit, changeMessage, insertEmoji, tempNewMessageText}) => {
     const messageFieldRef = useRef<HTMLInputElement>(null);
-
-    const messageSent = (event: any) => {
-        if (event.keyCode === 13 && event.target.value) {
-            onSubmit(event.target.value)
-        }
-    }
 
     const clickOnEmoji =() => {
         insertEmoji()
@@ -28,7 +22,7 @@ const MessageForm: React.FC<PropsType> = ({onSubmit, changeMessage, insertEmoji,
     return (
         <Form
             onSubmit={onSubmit}
-            initialValues={{ message: tempNewMessage }}
+            initialValues={{ message: tempNewMessageText }}
             render={({ handleSubmit, form, submitting, pristine, values }) => (
                 <form onSubmit={handleSubmit}>
                     <div className={cls.chatForm}>

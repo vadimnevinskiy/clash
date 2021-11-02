@@ -14,6 +14,7 @@ import {useActions} from "../../hooks/useActions";
 
 
 
+
 interface PropsType {
     newMessage: string
     socket: Socket
@@ -22,6 +23,7 @@ interface PropsType {
 const ChatBody: React.FC<PropsType> = ({newMessage, socket}) => {
     const {historyMessages, limit, skip, error} = useTypedSelector(state => state.historyMessages)
     const chatBodyRef = React.useRef<HTMLDivElement>(null);
+    const lastMessageRef = React.useRef<HTMLDivElement>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const {fetchHistoryMessages, setMessage} = useActions()
     const [viewHistory, setViewHistory] = useState<boolean>(false)
@@ -54,7 +56,7 @@ const ChatBody: React.FC<PropsType> = ({newMessage, socket}) => {
     }, [])
 
 
-    // If sent new message from form
+    // If sent new message from Form
     useEffect(() => {
         if (newMessage) {
             const nowDate = new Date()
@@ -85,13 +87,13 @@ const ChatBody: React.FC<PropsType> = ({newMessage, socket}) => {
     //if updated historyMessages, go to bottom of chat
     useEffect(() => {
         if (!viewHistory) {
+           //If view realtime chat, set scroll to the end of the list messages
             chatBodyRef.current!.scrollTop = chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight
         }
         if (viewHistory) {
-            console.log('Устанавливаем позицию===============', lastPosition)
+            //If view history, set scroll to the first message in the last portion
             chatBodyRef.current!.scrollTop = lastPosition
         }
-        console.log('=====================Загрузка=====================')
     }, [historyMessages])
 
 
@@ -102,33 +104,34 @@ const ChatBody: React.FC<PropsType> = ({newMessage, socket}) => {
         fetchHistoryMessages(limit, count)
     }
 
+    const toggleHistoryFlag = (scrollTop: number, scrollHeight: number, clientHeight: number) => {
+        if (scrollTop < scrollHeight - clientHeight) {
+            //If started scrolling the page, set the flag viewHistory == true
+            setViewHistory(true)
+        } else if (scrollTop === scrollHeight - clientHeight) {
+            //If scroll position at bottom, set the flag viewHistory == false
+            setViewHistory(false)
+        }
+    }
 
     //If scrolled chat at top, fetching new portion messages
     const scrollHandler = (e: any) => {
+        const scrollTop = e.target.scrollTop //Высота верхней невидимой области контента за пределами блока
+        const scrollHeight = chatBodyRef.current!.scrollHeight //Общая высота контента
+        const clientHeight = chatBodyRef.current!.clientHeight //Высота видимой части блока
+
+        //If scroll position at top, fetching new portion of messages
         if (e.target.scrollTop === 0) {
             fetchingPortion()
         }
-        // console.log(e.target.scrollTop, '=====', chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight)
-        // console.log('scrollHeight = ', chatBodyRef.current!.scrollHeight)
-        // console.log('clientHeight = ', chatBodyRef.current!.clientHeight)
 
-        const scrollTop = e.target.scrollTop
-        const scrollHeight = chatBodyRef.current!.scrollHeight
-        const clientHeight = chatBodyRef.current!.clientHeight
-
+        //If started scrolling chat, remember last message on the list
         if (scrollTop < (scrollHeight - clientHeight) && scrollTop > (scrollHeight - clientHeight - 10)) {
-            setLastPosition(e.target.scrollTop)
-            console.log('Запоминаем позицию========', e.target.scrollTop)
+            setLastPosition(lastMessageRef.current!.offsetTop)
         }
 
+        toggleHistoryFlag(scrollTop, scrollHeight, clientHeight)
 
-        if (e.target.scrollTop < chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight) {
-            console.log('Просмотр архива!')
-            setViewHistory(true)
-        } else if (e.target.scrollTop === chatBodyRef.current!.scrollHeight - chatBodyRef.current!.clientHeight) {
-            console.log('Последние сообщения!')
-            setViewHistory(false)
-        }
     }
 
 
@@ -141,8 +144,12 @@ const ChatBody: React.FC<PropsType> = ({newMessage, socket}) => {
             {
                 historyMessages.map((message, index) => {
                     return (
-                        <div key={message.id + index}>
-                            <MessageItem message={message} />
+                        <div key={message.id + index} className={cls.MessageId}>
+                            {
+                                index === 14 &&
+                                <div ref={lastMessageRef} style={{fontSize: 1, lineHeight: 1, height: 1}}>&nbsp;</div>
+                            }
+                            <MessageItem message={message} index={index} />
                         </div>
                     )
                 })
